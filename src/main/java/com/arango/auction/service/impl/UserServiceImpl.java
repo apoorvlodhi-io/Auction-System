@@ -1,9 +1,9 @@
 package com.arango.auction.service.impl;
 
-import com.arango.auction.model.Item;
 import com.arango.auction.model.User;
 import com.arango.auction.repository.UserRepository;
 import com.arango.auction.service.UserService;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +15,18 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    DSLContext dslContext;
     @Override
     public User addUser(User user) {
-        return userRepository.save(user);
+        Long userId = dslContext.transactionResult(()-> userRepository.insert(user));
+        user.setUserId(userId);
+        return user;
     }
 
     @Override
-    public Object deleteUser(String userId) {
+    public Object deleteUser(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if(optionalUser.isPresent()){
             userRepository.deleteById(userId);

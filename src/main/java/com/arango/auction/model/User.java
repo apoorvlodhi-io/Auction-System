@@ -1,16 +1,20 @@
 package com.arango.auction.model;
 
-import com.arangodb.springframework.annotation.ArangoId;
-import com.arangodb.springframework.annotation.Document;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
-
+import lombok.NoArgsConstructor;
+import javax.persistence.*;
 @Data
-
-@Document("Users")
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "Users")
 public class User {
-    @ArangoId
-    private String userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
 
     private String name;
     private String email;

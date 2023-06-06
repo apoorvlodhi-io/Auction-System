@@ -1,27 +1,30 @@
 package com.arango.auction.model;
 
 import com.arango.auction.constants.AuctionStatus;
-import com.arangodb.springframework.annotation.ArangoId;
-import com.arangodb.springframework.annotation.Document;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
-import java.time.Duration;
+import lombok.NoArgsConstructor;
+import javax.persistence.*;
 import java.time.LocalDateTime;
-
-@Document("Auction")
 @Data
+@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "Auction")
 public class Auction {
-    @ArangoId
-    private String auctionId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long auctionId;
 
     private String auctionName;
     private AuctionStatus auctionStatus;
-
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private long duration;
-    private String itemId;
-    private long basePrice;
-    private long stepRate;
-    private long highestBid;
+    private Long duration;
+    private Long itemId;
+    private Long basePrice;
+    private Long stepRate;
+    private Long highestBid;
 }

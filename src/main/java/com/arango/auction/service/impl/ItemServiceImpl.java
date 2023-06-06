@@ -3,11 +3,11 @@ package com.arango.auction.service.impl;
 
 import com.arango.auction.constants.AuctionExceptions;
 import com.arango.auction.constants.AuctionStatus;
-import com.arango.auction.model.Auction;
 import com.arango.auction.model.Item;
 import com.arango.auction.repository.AuctionRepository;
 import com.arango.auction.repository.ItemRepository;
 import com.arango.auction.service.ItemService;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +21,23 @@ public class ItemServiceImpl implements ItemService {
     private ItemRepository itemRepository;
 
     @Autowired
+    private DSLContext dslContext;
+
+    @Autowired
     AuctionRepository auctionRepository;
     public Item saveItem(Item item) {
-        return itemRepository.save(item);
+        Long itemId = dslContext.transactionResult(()-> itemRepository.insert(item));
+        item.setItemId(itemId);
+        return item;
     }
 
     @Override
-    public Object editItem(String itemId, Item item) {
-        Optional<Item> optionalItem = itemRepository.findById(itemId);
+    public Item editItem(Long itemId,Item item) {
+        Optional<Item> optionalItem = itemRepository.findById(item.getItemId());
         if(optionalItem.isPresent()){
+            dslContext.transaction(() -> itemRepository.updateItem(itemId, item.getItemName()));
             item.setItemId(itemId);
-            return itemRepository.save(item);
+            return item;
         }
         else{
             throw new AuctionExceptions("Item not found");
@@ -40,14 +46,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<Item> findAll() {
-        return (List<Item>) itemRepository.findAll();
+        return itemRepository.findAll();
     }
 
     @Override
-    public Object deleteItem(String itemId) {
+    public Object deleteItem(Long itemId) {
         Optional<Item> optionalItem = itemRepository.findById(itemId);
         if(optionalItem.isPresent()){
-            itemRepository.deleteById(itemId);
+            dslContext.transaction(() -> itemRepository.deleteById(itemId));
             return "Item Deleted Successfully";
         }else {
             return "Item not found!";

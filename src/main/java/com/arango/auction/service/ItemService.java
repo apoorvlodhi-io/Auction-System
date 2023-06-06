@@ -10,7 +10,7 @@ public interface ItemService {
 
     List<Item> findAll();
 
-    Object deleteItem(String itemId);
+    Object deleteItem(Long itemId);
 
-    Object editItem(String itemId, Item item);
+    Object editItem(Long itemId, Item item);
 }

@@ -32,12 +32,12 @@ public class BidController {
     }
 
     @GetMapping(value = "/all/user")
-    public List<Bid> getBidsByUser(@RequestParam(value = "userId") String userId){
+    public List<Bid> getBidsByUser(@RequestParam(value = "userId") Long userId){
         return bidService.getAllBidsByUser(userId);
     }
 
     @GetMapping(value = "/one")
-    public Bid getParticularBid(@RequestParam(value = "bidId") String bidId){
+    public Bid getParticularBid(@RequestParam(value = "bidId") Long bidId){
         return bidService.getParticularBid(bidId);
     }
 }

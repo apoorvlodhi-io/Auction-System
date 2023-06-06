@@ -1,6 +1,7 @@
 package com.arango.auction.service;
 
 import com.arango.auction.model.Auction;
+import com.arango.auction.model.Bid;
 
 public interface EmailService {
 
@@ -8,5 +9,5 @@ public interface EmailService {
 
     void scheduleEmail(Auction auction);
 
-    void notifyOfNewBid(Auction auction);
+    void notifyOfNewBid(Auction auction, Bid bid);
 }

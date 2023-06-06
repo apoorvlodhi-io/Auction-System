@@ -15,11 +15,13 @@ import com.arango.auction.repository.ItemRepository;
 import com.arango.auction.repository.UserRepository;
 import com.arango.auction.service.BidService;
 import com.arango.auction.service.EmailService;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.Math.max;
@@ -40,6 +42,9 @@ public class BidServiceImpl implements BidService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    DSLContext dslContext;
+
     public Bid placeBid(Bid bid) {
         //TODO: Check for USer, Auction exists, already existing bid for same amount for same item
         Optional<User> optionalUser = userRepository.findById(bid.getUserId());
@@ -59,36 +64,32 @@ public class BidServiceImpl implements BidService {
             throw new AuctionExceptions("Item not present");
         }
 
-        long highestBid = optionalAuction.get().getHighestBid();
+        long highestBid = Objects.isNull(auction.getHighestBid()) ? 0 : auction.getHighestBid();
         if(bid.getBidAmount() <= max(highestBid,auction.getBasePrice()) + auction.getStepRate()){
-            bid.setBidStatus(BidStatus.REJECTED);
-            bidRepository.save(bid);
             throw new AuctionExceptions("Bid amount not enough.");
         }
 
-        auction.setHighestBid(bid.getBidAmount());
-        auctionRepository.save(auction);
+        dslContext.transaction(() -> auctionRepository.updateHighestbid(auction.getAuctionId(), bid.getBidAmount()));
         bid.setBidStatus(BidStatus.ACCEPTED);
         bid.setBidTime(LocalDateTime.now());
-        bidRepository.save(bid);
-
-        emailService.notifyOfNewBid(auction);
-
+        Long bidId = dslContext.transactionResult(()-> bidRepository.insert(bid));
+        bid.setBidId(bidId);
+        emailService.notifyOfNewBid(auction,bid);
         return bid;
     }
 
     @Override
     public List<Bid> getAllBids() {
-        return (List<Bid>) bidRepository.findAll();
+        return bidRepository.findAll();
     }
 
     @Override
-    public List<Bid> getAllBidsByUser(String userId) {
+    public List<Bid> getAllBidsByUser(Long userId) {
         return bidRepository.findByUserId(userId);
     }
 
     @Override
-    public Bid getParticularBid(String bidId) {
+    public Bid getParticularBid(Long bidId) {
         Optional<Bid> optionalBid = bidRepository.findById(bidId);
         if (optionalBid.isPresent()) {
             return optionalBid.get();

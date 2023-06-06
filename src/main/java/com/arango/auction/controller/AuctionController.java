@@ -25,12 +25,12 @@ public class AuctionController {
     }
 
     @PostMapping(value = "/start")
-    public String startAuction(@RequestParam(value = "auctionId") String auctionId) {
+    public String startAuction(@RequestParam(value = "auctionId") Long auctionId) {
         return auctionService.startAuction(auctionId);
     }
 
     @PostMapping("/stop")
-    public String stopAuction(@RequestParam(value = "auctionId") String auctionId) {
+    public String stopAuction(@RequestParam(value = "auctionId") Long auctionId) {
         return auctionService.stopAuction(auctionId);
     }
 
@@ -45,7 +45,7 @@ public class AuctionController {
     }
 
     @GetMapping
-    public Auction getAuctionById(@RequestParam(value = "auctionId")String auctionId) {
+    public Auction getAuctionById(@RequestParam(value = "auctionId")Long auctionId) {
         return auctionService.getAuctionById(auctionId);
     }
 

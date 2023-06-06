@@ -9,7 +9,7 @@ public interface BidService {
 
     List<Bid> getAllBids();
 
-    List<Bid> getAllBidsByUser(String userId);
+    List<Bid> getAllBidsByUser(Long userId);
 
-    Bid getParticularBid(String bidId);
+    Bid getParticularBid(Long bidId);
 }

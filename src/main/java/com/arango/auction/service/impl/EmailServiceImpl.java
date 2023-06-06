@@ -41,7 +41,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void scheduleEmail(Auction auction) {
         log.info("scheduleEmail called for auctionID:{}, with highest bid:{}",auction.getAuctionId(),auction.getHighestBid());
-        long highestBidAmount = auction.getHighestBid();
+        Long highestBidAmount = auction.getHighestBid();
         Bid highestBid = bidRepository.findByBidAmountAndBidStatus(highestBidAmount, BidStatus.ACCEPTED);
         Optional<User> optionalUser = userRepository.findById(highestBid.getUserId());
         if(optionalUser.isPresent()){
@@ -54,14 +54,11 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void notifyOfNewBid(Auction auction) {
+    public void notifyOfNewBid(Auction auction, Bid highestBid) {
         log.info("notifyOfNewBid called for auctionID:{}, with highest bid:{}",auction.getAuctionId(),auction.getHighestBid());
-        long highestBidAmount = auction.getHighestBid();
-
-        List<Bid> successfulBids = bidRepository.findByAuctionIdAndBidStatus(auction.getAuctionId(),BidStatus.ACCEPTED);
+        Long highestBidAmount = highestBid.getBidAmount();
+        List<Bid> successfulBids = bidRepository.findBidsByOthers(auction.getAuctionId(),BidStatus.ACCEPTED, highestBid.getUserId());
         for(Bid bid : successfulBids){
-            if(bid.getBidAmount() != highestBidAmount){
-
                 Optional<User> optionalUser = userRepository.findById(bid.getUserId());
                 if(optionalUser.isPresent()){
                     User user = optionalUser.get();
@@ -70,7 +67,6 @@ public class EmailServiceImpl implements EmailService {
                 }else{
                     throw new AuctionExceptions("User not present");
                 }
-            }
         }
     }
 }

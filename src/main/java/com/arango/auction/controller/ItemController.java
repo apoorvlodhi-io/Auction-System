@@ -20,12 +20,12 @@ public class ItemController {
     }
 
     @PostMapping(value = ("/delete/{id}"))
-    public ResponseEntity deleteItem(@PathVariable(value = "id")String itemId) {
+    public ResponseEntity deleteItem(@PathVariable(value = "id")Long itemId) {
         return new ResponseEntity(itemService.deleteItem(itemId), HttpStatus.OK);
     }
 
     @PostMapping(value = ("/edit/{id}"))
-    public ResponseEntity editItem(@PathVariable(value = "id") String itemId,@RequestBody Item item) {
+    public ResponseEntity editItem(@PathVariable(value = "id") Long itemId,@RequestBody Item item) {
         return new ResponseEntity(itemService.editItem(itemId,item), HttpStatus.OK);
     }
 
