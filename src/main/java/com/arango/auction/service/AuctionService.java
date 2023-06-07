@@ -2,6 +2,7 @@ package com.arango.auction.service;
 
 
 import com.arango.auction.model.Auction;
+import com.arango.auction.pojo.GenericResponse;
 
 import java.io.IOException;
 import java.util.List;

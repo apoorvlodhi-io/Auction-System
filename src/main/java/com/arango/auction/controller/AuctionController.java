@@ -4,12 +4,11 @@ package com.arango.auction.controller;
 import com.arango.auction.model.Auction;
 import com.arango.auction.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.print.Pageable;
+import com.arango.auction.pojo.GenericResponse;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.List;
 
 @RestController
@@ -21,7 +20,7 @@ public class AuctionController {
 
     @PostMapping(value = "/create")
     public Auction createAuction(@RequestBody Auction auction) throws IOException {
-        return auctionService.createAuction(auction);
+        return  auctionService.createAuction(auction);
     }
 
     @PostMapping(value = "/start")

@@ -24,16 +24,15 @@ public class BidRepository{
     @Autowired
     private DSLContext dslContext;
 
-    public Long insert(Bid bid) {
-        BidsRecord record = dslContext.newRecord(BIDS);
-        record.setItemId(bid.getItemId());
+    public Bid insert(Bid bid) {
+        BidsRecord record = dslContext.newRecord(BIDS); //todo
         record.setUserId(bid.getUserId());
         record.setAuctionId(bid.getAuctionId());
         record.setBidAmount(bid.getBidAmount());
         record.setBidTime(bid.getBidTime());
         record.setBidStatus(String.valueOf(bid.getBidStatus()));
         record.insert();
-        return record.getBidId();
+        return toBids(record);
     }
 
     public Optional<Bid> findById(Long id) {
@@ -41,7 +40,7 @@ public class BidRepository{
                 .where(BIDS.BID_ID.eq(id))
                 .fetchOne();
         if (record != null) {
-            return Optional.of(toBids(record));
+            return Optional.of(toBids(record)); //optional.nullabale
         }
         return Optional.empty();
     }
@@ -50,14 +49,14 @@ public class BidRepository{
         return dslContext.selectFrom(BIDS)
                 .where(BIDS.BID_STATUS.eq(bidStatus))
                 .fetch()
-                .map(record -> toBids(record));
+                .map(this::toBids);
     }
 
     public List<Bid> findByUserId(Long userId) {
         return dslContext.selectFrom(BIDS)
                 .where(BIDS.USER_ID.eq(userId))
                 .fetch()
-                .map(record -> toBids(record));
+                .map(this::toBids);
     }
 
     public Bid findByBidAmountAndBidStatus(long highestBidAmount, BidStatus bidStatus) {
@@ -89,7 +88,6 @@ public class BidRepository{
     private Bid toBids(BidsRecord re) {
         return Bid.builder()
                 .bidId(re.getBidId())
-                .itemId(re.getItemId())
                 .userId(re.getUserId())
                 .auctionId(re.getAuctionId())
                 .bidAmount(re.getBidAmount())

@@ -1,4 +1,16 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: team.whitehatsr@gmail.com
+    password: xumrmnttbttxzevk
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   datasource:
     url: jdbc:mysql://localhost:3306/mydb
     username: root
@@ -7,3 +19,16 @@ spring:
     hikari:
       auto-commit: false
       transaction-isolation: TRANSACTION_READ_COMMITTED
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+
+  main:
+    allow-bean-definition-overriding: true
+
+gcloud:
+  projectId: new-tasks-388306
+  location: asia-south1
+  queueName: my-queue2

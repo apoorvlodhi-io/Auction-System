@@ -20,24 +20,18 @@ public class UserServiceImpl implements UserService {
     DSLContext dslContext;
     @Override
     public User addUser(User user) {
-        Long userId = dslContext.transactionResult(()-> userRepository.insert(user));
-        user.setUserId(userId);
-        return user;
+        return dslContext.transactionResult(()-> userRepository.insert(user));
     }
 
     @Override
     public Object deleteUser(Long userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if(optionalUser.isPresent()){
-            userRepository.deleteById(userId);
-            return "User Deleted Successfully";
-        }else {
-            return "User not found!";
-        }
+        userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found!"));
+        userRepository.deleteById(userId);
+        return "User Deleted Successfully";
     }
 
     @Override
     public List<User> findAll() {
-        return (List<User>) userRepository.findAll();
+        return userRepository.findAll();
     }
 }

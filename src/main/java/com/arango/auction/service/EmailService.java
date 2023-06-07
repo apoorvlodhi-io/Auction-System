@@ -9,5 +9,5 @@ public interface EmailService {
 
     void scheduleEmail(Auction auction);
 
-    void notifyOfNewBid(Auction auction, Bid bid);
+//    void notifyOfNewBid(Auction auction, Bid bid);
 }

@@ -20,12 +20,12 @@ public class UserRepository {
     @Autowired
     private DSLContext dslContext;
 
-    public Long insert(User user) {
+    public User insert(User user) {
         UsersRecord record = dslContext.newRecord(USERS);
         record.setName(user.getName());
         record.setEmail(user.getEmail());
         record.insert();
-        return record.getUserId();
+        return toUser(record);
     }
 
     public Optional<User> findById(Long id) {
@@ -47,7 +47,7 @@ public class UserRepository {
     public List<User> findAll() {
         return dslContext.selectFrom(USERS)
                 .fetch()
-                .map(record -> toUser(record));
+                .map(this::toUser);
     }
 
     private User toUser(UsersRecord re) {

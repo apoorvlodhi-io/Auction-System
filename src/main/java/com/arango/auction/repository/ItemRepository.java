@@ -25,11 +25,11 @@ public class ItemRepository{
     @Autowired
     private DSLContext dslContext;
 
-    public Long insert(Item item) {
+    public Item insert(Item item) {
         ItemsRecord record = dslContext.newRecord(ITEMS);
         record.setItemName(item.getItemName());
         record.insert();
-        return record.getItemId();
+        return toItem(record);
     }
 
     public void updateItem(Long itemId, String itemName) {

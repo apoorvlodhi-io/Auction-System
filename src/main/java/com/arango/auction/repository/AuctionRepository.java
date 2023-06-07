@@ -25,19 +25,18 @@ public class AuctionRepository {
     @Autowired
     private DSLContext dslContext;
 
-    public Long insert(Auction auction) {
+    public Auction insert(Auction auction) {
         AuctionRecord record = dslContext.newRecord(AUCTION);
         record.setAuctionName(auction.getAuctionName());
         record.setAuctionStatus(auction.getAuctionStatus().name());
         record.setStartTime(auction.getStartTime());
-        record.setEndTime(auction.getEndTime());
         record.setDuration(auction.getDuration());
         record.setItemId(auction.getItemId());
         record.setBasePrice(auction.getBasePrice());
         record.setStepRate(auction.getStepRate());
-        record.setHighestBid(auction.getHighestBid());
+        record.setHighestBid(0L);
         record.insert();
-        return record.getAuctionId();
+        return toAuction(record);
     }
 
     public void updateStatus(Long auctionId, AuctionStatus auctionStatus) {
@@ -64,17 +63,38 @@ public class AuctionRepository {
         return Optional.empty();
     }
 
+    public Optional<Auction> findByIdAndStatus(Long id, AuctionStatus auctionStatus) {
+        AuctionRecord record = dslContext.selectFrom(AUCTION)
+                .where(AUCTION.AUCTION_ID.eq(id))
+                .and(AUCTION.AUCTION_STATUS.eq(auctionStatus.name()))
+                .fetchOne();
+        if (record != null) {
+            return Optional.of(toAuction(record));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Auction> findByItemId(Long itemId) {
+        AuctionRecord record = dslContext.selectFrom(AUCTION)
+                .where(AUCTION.ITEM_ID.eq(itemId))
+                .fetchOne();
+        if (record != null) {
+            return Optional.of(toAuction(record));
+        }
+        return Optional.empty();
+    }
+
     public List<Auction> findByStatus(String auctionStatus) {
         return dslContext.selectFrom(AUCTION)
                 .where(AUCTION.AUCTION_STATUS.eq(auctionStatus))
                 .fetch()
-                .map(record -> toAuction(record));
+                .map(this::toAuction);
     }
 
     public List<Auction> findAll() {
         return dslContext.selectFrom(AUCTION)
                 .fetch()
-                .map(record -> toAuction(record));
+                .map(this::toAuction);
     }
 
     private Auction toAuction(AuctionRecord re) {
@@ -83,7 +103,6 @@ public class AuctionRepository {
                 .auctionName(re.getAuctionName())
                 .auctionStatus(AuctionStatus.valueOf(re.getAuctionStatus()))
                 .startTime(re.getStartTime())
-                .endTime(re.getEndTime())
                 .duration(re.getDuration())
                 .itemId(re.getItemId())
                 .basePrice(re.getBasePrice())
@@ -99,7 +118,6 @@ public class AuctionRepository {
                 .auctionName(record.get(AUCTION.AUCTION_NAME))
                 .auctionStatus(AuctionStatus.valueOf(record.get(AUCTION.AUCTION_STATUS)))
                 .startTime(record.get(AUCTION.START_TIME))
-                .endTime(record.get(AUCTION.END_TIME))
                 .duration(record.get(AUCTION.DURATION))
                 .itemId(record.get(AUCTION.ITEM_ID))
                 .basePrice(record.get(AUCTION.BASE_PRICE))
@@ -107,6 +125,7 @@ public class AuctionRepository {
                 .highestBid(record.get(AUCTION.HIGHEST_BID))
                 .build();
     }
+
 
 }
 

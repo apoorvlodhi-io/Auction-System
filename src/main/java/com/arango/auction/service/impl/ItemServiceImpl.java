@@ -25,23 +25,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     AuctionRepository auctionRepository;
+
     public Item saveItem(Item item) {
-        Long itemId = dslContext.transactionResult(()-> itemRepository.insert(item));
-        item.setItemId(itemId);
-        return item;
+        return dslContext.transactionResult(() -> itemRepository.insert(item));
     }
 
     @Override
-    public Item editItem(Long itemId,Item item) {
-        Optional<Item> optionalItem = itemRepository.findById(item.getItemId());
-        if(optionalItem.isPresent()){
-            dslContext.transaction(() -> itemRepository.updateItem(itemId, item.getItemName()));
-            item.setItemId(itemId);
-            return item;
-        }
-        else{
-            throw new AuctionExceptions("Item not found");
-        }
+    public String editItem(Long itemId, Item item) {
+        itemRepository.findById(item.getItemId()).orElseThrow(() -> new AuctionExceptions("Item not found"));
+        dslContext.transaction(() -> itemRepository.updateItem(itemId, item.getItemName()));
+        return "Item updated successfully";
     }
 
     @Override
@@ -50,17 +43,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Object deleteItem(Long itemId) {
-        Optional<Item> optionalItem = itemRepository.findById(itemId);
-        if(optionalItem.isPresent()){
-            dslContext.transaction(() -> itemRepository.deleteById(itemId));
-            return "Item Deleted Successfully";
-        }else {
-            return "Item not found!";
-        }
+    public String deleteItem(Long itemId) {
+        itemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found!"));
+        dslContext.transaction(() -> itemRepository.deleteById(itemId));
+        return "Item Deleted Successfully";
     }
-
-
 }
 
 

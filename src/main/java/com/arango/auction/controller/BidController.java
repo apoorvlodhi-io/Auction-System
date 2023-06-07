@@ -20,20 +20,14 @@ public class BidController {
         return bidService.placeBid(bid);
     }
 
-//    @PostMapping(value = "/newBid/{auctionId}")
-//    public Bid placenewBid(@PathVariable(value = "auctionId")String auctionId,@RequestBody Bid bid) {
-//        bid.setAuctionId(auctionId);
-//        return bidService.placeBid(bid);
-//    }
-
     @GetMapping(value = "/all")
     public List<Bid> getAllBids(){
         return bidService.getAllBids();
     }
 
     @GetMapping(value = "/all/user")
-    public List<Bid> getBidsByUser(@RequestParam(value = "userId") Long userId){
-        return bidService.getAllBidsByUser(userId);
+    public ResponseEntity getBidsByUser(@RequestParam(value = "userId") Long userId){
+        return new ResponseEntity(bidService.getAllBidsByUser(userId),HttpStatus.OK);
     }
 
     @GetMapping(value = "/one")
