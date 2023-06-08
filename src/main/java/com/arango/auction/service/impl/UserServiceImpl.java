@@ -3,6 +3,7 @@ package com.arango.auction.service.impl;
 import com.arango.auction.model.User;
 import com.arango.auction.repository.UserRepository;
 import com.arango.auction.service.UserService;
+import lombok.AllArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,13 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    DSLContext dslContext;
+    private UserRepository userRepository;
+    private DSLContext dslContext;
     @Override
     public User addUser(User user) {
         return dslContext.transactionResult(()-> userRepository.insert(user));

@@ -7,6 +7,7 @@ import com.arango.auction.model.Item;
 import com.arango.auction.repository.AuctionRepository;
 import com.arango.auction.repository.ItemRepository;
 import com.arango.auction.service.ItemService;
+import lombok.AllArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,17 +16,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class ItemServiceImpl implements ItemService {
-
-    @Autowired
     private ItemRepository itemRepository;
-
-    @Autowired
     private DSLContext dslContext;
+    private AuctionRepository auctionRepository;
 
-    @Autowired
-    AuctionRepository auctionRepository;
-
+    @Override
     public Item saveItem(Item item) {
         return dslContext.transactionResult(() -> itemRepository.insert(item));
     }

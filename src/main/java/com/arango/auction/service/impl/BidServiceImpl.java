@@ -9,6 +9,7 @@ import com.arango.auction.model.Auction;
 import com.arango.auction.model.Bid;
 import com.arango.auction.model.Item;
 import com.arango.auction.model.User;
+import com.arango.auction.pojo.GenericResponse;
 import com.arango.auction.repository.AuctionRepository;
 import com.arango.auction.repository.BidRepository;
 import com.arango.auction.repository.ItemRepository;
@@ -42,9 +43,11 @@ public class BidServiceImpl implements BidService {
     @Override
     public Bid placeBid(Bid bid) {
         //TODO: Check for USer, Auction exists, already existing bid for same amount for same item
-        userRepository.findById(bid.getUserId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found with ID: " + bid.getUserId()));
+        userRepository.findById(bid.getUserId())
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found with ID: " + bid.getUserId()));
 
-        Auction auction = auctionRepository.findByIdAndStatus(bid.getAuctionId(),AuctionStatus.RUNNING).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Auction not found with ID: " + bid.getAuctionId()));
+        Auction auction = auctionRepository.findByIdAndStatus(bid.getAuctionId(),AuctionStatus.RUNNING)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Auction not found with ID: " + bid.getAuctionId()));
 
         long currHighestBid = auction.getHighestBid();
         if(bid.getBidAmount() < max(currHighestBid , auction.getBasePrice()) + auction.getStepRate()){

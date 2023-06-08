@@ -1,6 +1,7 @@
 package com.arango.auction.controller;
 
 import com.arango.auction.model.Bid;
+import com.arango.auction.pojo.GenericResponse;
 import com.arango.auction.service.BidService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

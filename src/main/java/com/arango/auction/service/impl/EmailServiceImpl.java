@@ -8,6 +8,7 @@ import com.arango.auction.model.User;
 import com.arango.auction.repository.BidRepository;
 import com.arango.auction.repository.UserRepository;
 import com.arango.auction.service.EmailService;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -19,16 +20,11 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class EmailServiceImpl implements EmailService {
-
-    @Autowired
     private JavaMailSender javaMailSender;
-
-    @Autowired
-    BidRepository bidRepository;
-
-    @Autowired
-    UserRepository userRepository;
+    private BidRepository bidRepository;
+    private UserRepository userRepository;
 
     public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();

@@ -25,10 +25,10 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
-    AuctionRepository auctionRepository;
-    ItemRepository itemRepository;
-    EmailService emailService;
-    DSLContext dslContext;
+    private final AuctionRepository auctionRepository;
+    private final ItemRepository itemRepository;
+    private final EmailService emailService;
+    private final DSLContext dslContext;
 
     @Override
     public Auction createAuction(Auction auction) {
@@ -59,7 +59,7 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     public String startAuction(Long auctionId) {
-        Auction auction = auctionRepository.findByIdAndStatus(auctionId,AuctionStatus.CREATED).orElseThrow(() -> new AuctionExceptions("Auction not found"));
+        Auction auction = auctionRepository.findByIdAndStatus(auctionId, AuctionStatus.CREATED).orElseThrow(() -> new AuctionExceptions("Auction not found"));
         dslContext.transaction(() -> auctionRepository.updateStatus(auctionId, AuctionStatus.RUNNING));
         return auction.getAuctionName() + " has been Started!!";
     }
@@ -72,17 +72,17 @@ public class AuctionServiceImpl implements AuctionService {
         }
         dslContext.transaction(() -> auctionRepository.updateStatus(auctionId, AuctionStatus.ENDED));
         emailService.scheduleEmail(auction);
-        return   auction.getAuctionName() + " has been ENDED!!";
+        return auction.getAuctionName() + " has been ENDED!!";
     }
 
     @Override
     public List<Auction> getAllAuctions() {
-        return  auctionRepository.findAll();
+        return auctionRepository.findAll();
     }
 
     @Override
     public Auction getAuctionById(Long id) {
-        return auctionRepository.findById(id).orElseThrow(()->new AuctionExceptions("Auction not found"));
+        return auctionRepository.findById(id).orElseThrow(() -> new AuctionExceptions("Auction not found"));
     }
 
     @Override

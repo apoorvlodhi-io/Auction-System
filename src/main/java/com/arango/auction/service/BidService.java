@@ -1,6 +1,7 @@
 package com.arango.auction.service;
 
 import com.arango.auction.model.Bid;
+import com.arango.auction.pojo.GenericResponse;
 
 import java.util.List;
 

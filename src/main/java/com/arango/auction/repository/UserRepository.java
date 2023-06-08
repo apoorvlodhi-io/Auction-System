@@ -16,7 +16,6 @@ import java.util.Optional;
 @Repository
 public class UserRepository {
     private static final com.arango.auction.jooq.tables.Users USERS = Tables.USERS.as("us");
-
     @Autowired
     private DSLContext dslContext;
 
