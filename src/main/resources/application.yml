@@ -12,13 +12,12 @@ spring:
             enable: true
 
   datasource:
-    url: jdbc:mysql://localhost:3306/mydb
+    url: jdbc:mysql://localhost:3306/auction_system
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: false
-      transaction-isolation: TRANSACTION_READ_COMMITTED
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect

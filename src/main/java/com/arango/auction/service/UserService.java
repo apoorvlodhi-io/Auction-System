@@ -5,9 +5,7 @@ import com.arango.auction.model.User;
 import java.util.List;
 
 public interface UserService {
-    User addUser(User user);
-
-    Object deleteUser(Long userId);
-
+    void addUser(User user);
+    void deleteUser(Long userId);
     List<User> findAll();
 }

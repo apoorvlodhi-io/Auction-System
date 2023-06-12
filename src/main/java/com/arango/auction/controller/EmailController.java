@@ -14,7 +14,7 @@ public class EmailController {
     @Autowired
     private EmailService emailService;
 
-    @PostMapping("/send-email")
+    @PostMapping("/v1/sendemail")
     public ResponseEntity<String> sendEmail(@RequestBody EmailRequest emailRequest) {
         // Extract the email parameters from the request
         String to = emailRequest.getTo();

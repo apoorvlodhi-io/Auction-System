@@ -1,31 +1,36 @@
 package com.arango.auction.service.impl;
 
+import com.arango.auction.constants.AuctionExceptions;
 import com.arango.auction.model.User;
 import com.arango.auction.repository.UserRepository;
 import com.arango.auction.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
-    private UserRepository userRepository;
-    private DSLContext dslContext;
+    private final UserRepository userRepository;
+    private final DSLContext dslContext;
+
     @Override
-    public User addUser(User user) {
-        return dslContext.transactionResult(()-> userRepository.insert(user));
+    @Transactional
+    public void addUser(User user) {
+        User savedUser = userRepository.insert(user);
+        log.info("User created with id:{}",savedUser.getUserId());
     }
 
     @Override
-    public Object deleteUser(Long userId) {
-        userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found!"));
+    public void deleteUser(Long userId) {
+        userRepository.findById(userId).orElseThrow(() -> new AuctionExceptions("User not found!"));
         userRepository.deleteById(userId);
-        return "User Deleted Successfully";
+        log.info("User deleted");
     }
 
     @Override

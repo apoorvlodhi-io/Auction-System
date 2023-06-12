@@ -4,24 +4,18 @@ package com.arango.auction.repository;
 import com.arango.auction.constants.AuctionStatus;
 import com.arango.auction.jooq.tables.records.AuctionRecord;
 import com.arango.auction.model.Auction;
-import com.arango.auction.model.Bid;
 import org.jooq.DSLContext;
-import org.jooq.Name;
 import org.jooq.Record;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.arango.auction.jooq.*;
 
-import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import static com.arango.auction.jooq.tables.Auction.AUCTION;
 
 @Repository
 public class AuctionRepository {
-    private static final com.arango.auction.jooq.tables.Auction AUCTION = Tables.AUCTION.as("ac");
-
     @Autowired
     private DSLContext dslContext;
 
@@ -35,21 +29,26 @@ public class AuctionRepository {
         record.setBasePrice(auction.getBasePrice());
         record.setStepRate(auction.getStepRate());
         record.setHighestBid(0L);
-        record.insert();
-        return toAuction(record);
+        record.setRevisionVersion(0L);
+        AuctionRecord savedRecord = dslContext.insertInto(AUCTION)
+                .set(record)
+                .returning(AUCTION.asterisk()).fetchOne();
+        return toAuction(Objects.requireNonNull(savedRecord));
     }
 
-    public void updateStatus(Long auctionId, AuctionStatus auctionStatus) {
+    public void updateStatus(Long auctionId, AuctionStatus auctionStatus, Long revisionVersion) {
         dslContext.update(AUCTION)
                 .set(AUCTION.AUCTION_STATUS, auctionStatus.name())
                 .where(AUCTION.AUCTION_ID.eq(auctionId))
-                .execute();
+                .and(AUCTION.REVISION_VERSION.eq(revisionVersion))
+                .execute(); //todo
     }
 
-    public void updateHighestbid(Long auctionId, Long highestBid) {
-        dslContext.update(AUCTION)
+    public int updateHighestbid(Long auctionId, Long highestBid, Long oldRevisionVersion) {
+        return dslContext.update(AUCTION)
                 .set(AUCTION.HIGHEST_BID,highestBid)
-                .where(AUCTION.AUCTION_ID.eq(auctionId))
+                .set(AUCTION.REVISION_VERSION,oldRevisionVersion + 1)
+                .where(AUCTION.AUCTION_ID.eq(auctionId),AUCTION.REVISION_VERSION.eq(oldRevisionVersion))
                 .execute();
     }
 
@@ -67,6 +66,7 @@ public class AuctionRepository {
         AuctionRecord record = dslContext.selectFrom(AUCTION)
                 .where(AUCTION.AUCTION_ID.eq(id))
                 .and(AUCTION.AUCTION_STATUS.eq(auctionStatus.name()))
+//                .forUpdate()
                 .fetchOne();
         if (record != null) {
             return Optional.of(toAuction(record));
@@ -108,6 +108,7 @@ public class AuctionRepository {
                 .basePrice(re.getBasePrice())
                 .stepRate(re.getStepRate())
                 .highestBid(re.getHighestBid())
+                .revisionVersion(re.getRevisionVersion())
                 .build();
 
     }
@@ -123,6 +124,7 @@ public class AuctionRepository {
                 .basePrice(record.get(AUCTION.BASE_PRICE))
                 .stepRate(record.get(AUCTION.STEP_RATE))
                 .highestBid(record.get(AUCTION.HIGHEST_BID))
+                .revisionVersion(record.get(AUCTION.REVISION_VERSION))
                 .build();
     }
 

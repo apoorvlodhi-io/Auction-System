@@ -11,26 +11,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/user")
+@RequestMapping(value = "/users")
 public class UserController {
-
     @Autowired
     UserService userService;
+
     @PostMapping(value = "/add")
-    public User addUser(@RequestBody User user){
-        return userService.addUser(user);
+    public void addUser(@RequestBody User user){userService.addUser(user);
     }
 
     @PostMapping(value = ("/delete/{id}"))
-    public ResponseEntity deleteUser(@PathVariable(value = "id")Long userId) {
-        return new ResponseEntity(userService.deleteUser(userId), HttpStatus.OK);
+    public void deleteUser(@PathVariable(value = "id")Long userId) {
+        userService.deleteUser(userId);
     }
-
-    @GetMapping(value = "/all")
+    @GetMapping
     public List<User> getAllUsers() {
         return userService.findAll();
 
     }
-
-
 }

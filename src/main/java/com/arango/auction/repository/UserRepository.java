@@ -7,15 +7,18 @@ import com.arango.auction.model.Item;
 import com.arango.auction.model.User;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import static com.arango.auction.jooq.tables.Items.ITEMS;
+import static com.arango.auction.jooq.tables.Users.USERS;
+
 
 @Repository
 public class UserRepository {
-    private static final com.arango.auction.jooq.tables.Users USERS = Tables.USERS.as("us");
     @Autowired
     private DSLContext dslContext;
 
@@ -23,8 +26,10 @@ public class UserRepository {
         UsersRecord record = dslContext.newRecord(USERS);
         record.setName(user.getName());
         record.setEmail(user.getEmail());
-        record.insert();
-        return toUser(record);
+        UsersRecord savedRecord = dslContext.insertInto(USERS)
+                .set(record)
+                .returning(USERS.asterisk()).fetchOne();
+        return toUser(Objects.requireNonNull(savedRecord));
     }
 
     public Optional<User> findById(Long id) {

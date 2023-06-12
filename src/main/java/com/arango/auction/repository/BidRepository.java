@@ -2,6 +2,7 @@ package com.arango.auction.repository;
 
 import com.arango.auction.constants.BidStatus;
 import com.arango.auction.jooq.Tables;
+import com.arango.auction.jooq.tables.records.AuctionRecord;
 import com.arango.auction.jooq.tables.records.BidsRecord;
 import com.arango.auction.model.Bid;
 import org.jooq.DSLContext;
@@ -9,17 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import static com.arango.auction.jooq.tables.Auction.AUCTION;
+import static com.arango.auction.jooq.tables.Bids.BIDS;
 
 @Repository
 public class BidRepository{
-//    List<Bid> findByUserId(Long userId);
-//
-//    Bid findByBidAmountAndBidStatus(long bidAmount, BidStatus bidStatus);
-//
-//    List<Bid> findByAuctionIdAndBidStatus(Long auctionId, BidStatus bidStatus);
-
-    private static final com.arango.auction.jooq.tables.Bids BIDS = Tables.BIDS.as("bd");
 
     @Autowired
     private DSLContext dslContext;
@@ -31,8 +29,10 @@ public class BidRepository{
         record.setBidAmount(bid.getBidAmount());
         record.setBidTime(bid.getBidTime());
         record.setBidStatus(String.valueOf(bid.getBidStatus()));
-        record.insert();
-        return toBids(record);
+        BidsRecord savedRecord = dslContext.insertInto(BIDS)
+                .set(record)
+                .returning(BIDS.asterisk()).fetchOne();
+        return toBids(Objects.requireNonNull(savedRecord));
     }
 
     public Optional<Bid> findById(Long id) {

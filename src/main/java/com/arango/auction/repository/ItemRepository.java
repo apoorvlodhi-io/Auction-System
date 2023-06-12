@@ -10,17 +10,18 @@ import com.arango.auction.model.Auction;
 import com.arango.auction.model.Item;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import static com.arango.auction.jooq.tables.Items.ITEMS;
+
 
 
 @Repository
 public class ItemRepository{
-    private static final com.arango.auction.jooq.tables.Items ITEMS = Tables.ITEMS.as("it");
 
     @Autowired
     private DSLContext dslContext;
@@ -28,8 +29,10 @@ public class ItemRepository{
     public Item insert(Item item) {
         ItemsRecord record = dslContext.newRecord(ITEMS);
         record.setItemName(item.getItemName());
-        record.insert();
-        return toItem(record);
+        ItemsRecord savedRecord = dslContext.insertInto(ITEMS)
+                .set(record)
+                .returning(ITEMS.asterisk()).fetchOne();
+        return toItem(Objects.requireNonNull(savedRecord));
     }
 
     public void updateItem(Long itemId, String itemName) {
